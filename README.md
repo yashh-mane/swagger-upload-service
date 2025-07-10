@@ -1,71 +1,69 @@
-📄 Swagger Upload & Auth Microservice
+🚀 Swagger Upload Service
 
-This is a simple Node.js + Express-based microservice that supports:
+A Node.js-based microservice that allows users to upload and validate Swagger (OpenAPI) specifications in JSON or YAML format.
+It includes user authentication, role-based authorization, file uploads, and a CI/CD pipeline that builds and deploys the app automatically to an EC2 instance using GitLab CI/CD.
 
-📝 User registration & login with JWT-based authentication
-🔐 Role-based access control (user & admin)
-📤 Admin-only Swagger file upload & validation (YAML/JSON)
+📋 Features
+✅ User registration & login with JWT-based authentication.
+✅ Role-based access control (user and admin).
+✅ Admins can upload Swagger files (YAML/JSON) or paste raw text.
+✅ Validates Swagger content and provides meaningful feedback.
+✅ REST APIs built with Express.js.
+✅ Data persistence with MongoDB & Mongoose.
+✅ Password hashing with bcrypt.
+✅ File uploads handled by multer.
+✅ YAML parsing with js-yaml.
+✅ CORS enabled for front-end integration.
+✅ Environment variables managed via dotenv.
 
-It demonstrates how to build a secure REST API with file uploads, authentication, and role-based permissions.
+🐳 CI/CD & Deployment
+This project comes with a GitLab CI/CD pipeline that:
+1️⃣ Builds the Node.js application into a Docker image.
+2️⃣ Tags the image with the current commit SHA.
+3️⃣ Pushes the Docker image to Docker Hub.
+4️⃣ Pulls the image from Docker Hub on an EC2 instance.
+5️⃣ Runs the container on EC2, exposing the API to the public.
+
+🛠️ Tech Stack & Libraries
+Node.js (v21)
+Express.js
+MongoDB + Mongoose
+JWT for authentication
+bcrypt for password hashing
+multer for file uploads
+js-yaml for YAML validation
+dotenv for environment variables
+CORS for cross-origin requests
+Docker for containerization
+GitLab CI/CD for automated build & deployment
+Docker Hub for image registry
+AWS EC2 for hosting the application
+
+🗃️ CI/CD Pipeline Overview
+
+✅ When you push to the main branch:
+Build stage
+Uses Docker-in-Docker to build the app as an image.
+Logs in to Docker Hub.
+Tags and pushes the image to Docker Hub.
+Deploy stage
+Runs on a GitLab runner already installed on the EC2 instance.
+Pulls the image from Docker Hub.
+Removes any existing container.
+Runs the new container on EC2.
+
+The EC2 runner is registered with GitLab and listens for jobs tagged with ec2-runner.
 
 
-🚀 Features
-✅ User registration & login (email + password)
-✅ Passwords hashed with bcrypt
-✅ JWT token-based authentication with expiry
-✅ Role-based access (user, admin) enforced through middleware
-✅ Supports uploading Swagger specs either:
+📦 API Endpoints
 
-as pasted text (application/json or text/plain)
+| Method | Endpoint                    | Description                     |
+| ------ | --------------------------- | ------------------------------- |
+| POST   | `/api/auth/register`        | Register a user                 |
+| POST   | `/api/auth/login`           | Login & get JWT                 |
+| POST   | `/api/admin/upload-swagger` | Admin-only: Upload Swagger spec |
 
-or as file upload (multipart/form-data)
-✅ Validates uploaded Swagger as either valid JSON or valid YAML
-
-🧰 Tech Stack & Libraries Used
-Node.js (v21 tested) — Server-side runtime
-Express.js — Routing & middleware framework
-MongoDB + Mongoose — Database & ODM
-bcrypt / bcryptjs — Secure password hashing
-jsonwebtoken — JWT token generation & verification
-dotenv — Environment variable management
-multer — Handling file uploads
-js-yaml — Parsing YAML files
-cors — Cross-origin request support
-
-📂 Project Structure
-/controllers
-    adminController.js      # Swagger upload handler
-    authController.js       # User login & registration
-/middleware
-    authMiddleware.js       # JWT authentication
-    roleMiddleware.js       # Admin-only check
-/models
-    User.js                  # User schema with pre-save hash
-/routes
-    adminRoutes.js           # /api/admin routes
-    authRoutes.js            # /api/auth routes
-app.js                       # Main server file
-
-🛡️ Functions/Logic Highlighted
-🔐 Authentication:
-Registration: hashes password using bcrypt before saving
-
-Login: verifies password with bcrypt.compare
-
-Generates JWT with user ID and role in payload (using jsonwebtoken)
-
-📝 Middleware:
-protect: checks Authorization header for JWT, verifies it, and attaches user info to req
-adminOnly: checks req.userRole and rejects if not admin
-
-📄 Swagger Upload:
-
-Accepts Swagger definition either:
-via req.body.swaggerText
-or via uploaded file using multer
-
-Validates content:
-First tries JSON.parse
-If that fails, tries js-yaml.load
-Responds with success/failure message accordingly
-
+🔗 Notes
+Ensure your EC2 instance has a GitLab runner installed & registered with the tag ec2-runner.
+Ensure your Docker Hub credentials (DOCKER_USERNAME & DOCKER_PASSWORD) are set in GitLab CI/CD variables.
+The pipeline runs on main branch.
